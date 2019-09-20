@@ -36,6 +36,7 @@ RUN apt-get update \
       libffi-dev \
       libgdbm3 \
       libgdbm-dev \
+      xvfb libgtk-3-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libsound2 \
     && rm -rf /var/lib/apt/lists/*
 
 
