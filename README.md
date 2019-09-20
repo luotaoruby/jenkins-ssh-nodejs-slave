@@ -1,0 +1,1 @@
+# jenkins-ssh-nodejs-slave
