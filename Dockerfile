@@ -1,28 +1,4 @@
-FROM openjdk:8-jdk
-
-ARG user=jenkins
-ARG group=jenkins
-ARG uid=1000
-ARG gid=1000
-ARG JENKINS_AGENT_HOME=/home/$user
-
-ENV JENKINS_AGENT_HOME $JENKINS_AGENT_HOME
-
-RUN groupadd -g $gid $group \
-    && useradd -d "$JENKINS_AGENT_HOME" -u "$uid" -g "$gid" -m -s /bin/bash "$user"
-RUN chown -R $user:$group $JENKINS_AGENT_HOME
-
-# setup SSH server
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y openssh-server \
-    && rm -rf /var/lib/apt/lists/*
-RUN sed -i /etc/ssh/sshd_config \
-        -e 's/#PermitRootLogin.*/PermitRootLogin no/' \
-        -e 's/#RSAAuthentication.*/RSAAuthentication yes/'  \
-        -e 's/#PasswordAuthentication.*/PasswordAuthentication no/' \
-        -e 's/#SyslogFacility.*/SyslogFacility AUTH/' \
-        -e 's/#LogLevel.*/LogLevel INFO/' && \
-    mkdir /var/run/sshd
+FROM luotaoruby/jenkins-ssh-slave:v1.0.0
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y autoconf \
@@ -36,9 +12,7 @@ RUN apt-get update \
       libffi-dev \
       libgdbm3 \
       libgdbm-dev \
-      xvfb libgtk-3-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 \
     && rm -rf /var/lib/apt/lists/*
-
 
 ARG NODE_MAJOR=10
 ARG YARN_VERSION=1.13.0
@@ -57,11 +31,3 @@ RUN apt-get update -qq && DEBIAN_FRONTEND=noninteractive apt-get -yq dist-upgrad
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     truncate -s 0 /var/log/*log
-
-WORKDIR "${JENKINS_AGENT_HOME}"
-
-COPY setup-sshd /usr/local/bin/setup-sshd
-
-EXPOSE 22
-
-ENTRYPOINT ["setup-sshd"]
