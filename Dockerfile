@@ -1,4 +1,4 @@
-FROM luotaoruby/jenkins-ssh-slave:v1.0.0
+FROM luotaoruby/jenkins-ssh-slave:1.0.0
 
 RUN apt-get update \
     && apt-get install --no-install-recommends -y autoconf \
